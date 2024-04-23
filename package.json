@@ -7,11 +7,18 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "lint-staged": {
-    "*.js": ["standard"]
+    "*.js": [
+      "standard --fix",
+      "git add"
+    ]
+  },
+  "husky": {
+    "pre-commit": "lint-staged"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
     "standard": "^17.1.0"
   }
