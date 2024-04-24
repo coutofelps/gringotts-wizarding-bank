@@ -1,10 +1,4 @@
-const validator = require('validator')
-
-class PasswordValidator {
-  isValid (password) {
-    return validator.isStrongPassword(password)
-  }
-}
+const PasswordValidator = require('./password-validator')
 
 const makeSut = () => {
   return new PasswordValidator()
