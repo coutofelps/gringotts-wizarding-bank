@@ -22,8 +22,6 @@ module.exports = class PasswordCheckRouter {
       return HttpReponse.badRequest()
     }
 
-    return {
-      statusCode: 200
-    }
+    return HttpReponse.ok({ isValidPassword })
   }
 }

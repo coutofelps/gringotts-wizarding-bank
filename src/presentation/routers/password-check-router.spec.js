@@ -95,7 +95,7 @@ describe('Password checker router', () => {
   })
 
   test('Should return 200 when valid credentials are provided', () => {
-    const { sut } = makeSut()
+    const { sut, passwordCheckUseCaseSpy } = makeSut()
 
     const httpRequest = {
       body: {
@@ -105,5 +105,6 @@ describe('Password checker router', () => {
 
     const httpResponse = sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(200)
+    expect(httpResponse.body.isValidPassword).toEqual(passwordCheckUseCaseSpy.isValidPassword)
   })
 })
