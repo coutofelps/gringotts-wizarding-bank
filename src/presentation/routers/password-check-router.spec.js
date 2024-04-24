@@ -1,16 +1,9 @@
 const PasswordCheckRouter = require('./password-check-router')
 const MissingParamError = require('../helpers/missing-param-error')
+const ServerError = require('../helpers/server-error')
 
 const makeSut = () => {
-  class PasswordCheckUseCaseSpy {
-    check (password) {
-      this.password = password
-
-      return this.isValidPassword
-    }
-  }
-
-  const passwordCheckUseCaseSpy = new PasswordCheckUseCaseSpy()
+  const passwordCheckUseCaseSpy = makePasswordCheckUseCaseSpy()
   passwordCheckUseCaseSpy.isValidPassword = true
 
   const sut = new PasswordCheckRouter(passwordCheckUseCaseSpy)
@@ -19,6 +12,28 @@ const makeSut = () => {
     sut,
     passwordCheckUseCaseSpy
   }
+}
+
+const makePasswordCheckUseCaseSpy = () => {
+  class PasswordCheckUseCaseSpy {
+    check (password) {
+      this.password = password
+
+      return this.isValidPassword
+    }
+  }
+
+  return new PasswordCheckUseCaseSpy()
+}
+
+const makePasswordCheckUseCaseSpyWithError = () => {
+  class PasswordCheckUseCaseSpy {
+    check () {
+      throw new Error()
+    }
+  }
+
+  return new PasswordCheckUseCaseSpy()
 }
 
 describe('Password checker router', () => {
@@ -40,8 +55,9 @@ describe('Password checker router', () => {
   test('Should return 500 if no httpRequest is provided', () => {
     const { sut } = makeSut()
 
-    const httpReponse = sut.route()
-    expect(httpReponse.statusCode).toBe(500)
+    const httpResponse = sut.route()
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
   })
 
   test('Should return 500 if httpRequest has no body', () => {
@@ -49,8 +65,9 @@ describe('Password checker router', () => {
 
     const httpRequest = {}
 
-    const httpReponse = sut.route(httpRequest)
-    expect(httpReponse.statusCode).toBe(500)
+    const httpResponse = sut.route(httpRequest)
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
   })
 
   test('Should call PasswordCheckUseCase with correct params', () => {
@@ -77,6 +94,7 @@ describe('Password checker router', () => {
 
     const httpResponse = sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
   })
 
   test('Should return 500 if no PasswordCheckUseCase has no check method', () => {
@@ -92,6 +110,24 @@ describe('Password checker router', () => {
 
     const httpResponse = sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
+  })
+
+  test('Should return 500 if no PasswordCheckUseCase throws ', () => {
+    const passwordCheckUseCaseSpy = makePasswordCheckUseCaseSpyWithError()
+    passwordCheckUseCaseSpy.isValidPassword = true
+
+    const sut = new PasswordCheckRouter(passwordCheckUseCaseSpy)
+
+    const httpRequest = {
+      body: {
+        password: 'any_password'
+      }
+    }
+
+    const httpResponse = sut.route(httpRequest)
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
   })
 
   test('Should return 200 when valid credentials are provided', () => {
