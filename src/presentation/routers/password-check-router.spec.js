@@ -3,7 +3,7 @@ const { InvalidParamError, MissingParamError, ServerError } = require('../errors
 
 const makePasswordCheckUseCaseSpy = () => {
   class PasswordCheckUseCaseSpy {
-    async check (password) {
+    async save (password) {
       this.password = password
 
       return this.isValidPassword
@@ -15,7 +15,7 @@ const makePasswordCheckUseCaseSpy = () => {
 
 const makePasswordCheckUseCaseSpyWithError = () => {
   class PasswordCheckUseCaseSpy {
-    async check () {
+    async save () {
       throw new Error()
     }
   }
@@ -121,8 +121,8 @@ describe('Password checker router', () => {
     expect(httpResponse.body).toEqual(new ServerError())
   })
 
-  test('Should return 500 if no PasswordCheckUseCase has no check method', async () => {
-    // Re-creating spy class with no check method
+  test('Should return 500 if no PasswordCheckUseCase has no save method', async () => {
+    // Re-creating spy class with no save method
     const passwordCheckUseCaseSpy = new PasswordCheckRouter({})
     const sut = new PasswordCheckRouter(passwordCheckUseCaseSpy)
 

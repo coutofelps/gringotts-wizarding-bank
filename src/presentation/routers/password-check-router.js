@@ -19,7 +19,7 @@ module.exports = class PasswordCheckRouter {
         return HttpReponse.badRequest(new InvalidParamError('password'))
       }
 
-      const isValidPassword = await this.passwordCheckUseCase.check(password)
+      const isValidPassword = await this.passwordCheckUseCase.save(password)
 
       if (!isValidPassword) {
         return HttpReponse.badRequest()
