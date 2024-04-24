@@ -1,5 +1,6 @@
 const PasswordCheckRouter = require('./password-check-router')
-const { InvalidParamError, MissingParamError, ServerError } = require('../errors')
+const { InvalidParamError, MissingParamError } = require('../utils/errors')
+const { ServerError } = require('../errors')
 
 const makePasswordCheckUseCaseSpy = () => {
   class PasswordCheckUseCaseSpy {
