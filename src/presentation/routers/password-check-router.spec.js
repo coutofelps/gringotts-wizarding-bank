@@ -61,4 +61,32 @@ describe('Password checker router', () => {
     sut.route(httpRequest)
     expect(passwordCheckUseCaseSpy.password).toBe(httpRequest.body.password)
   })
+
+  test('Should return 500 if no PasswordCheckUseCase is provided', () => {
+    const sut = new PasswordCheckRouter()
+
+    const httpRequest = {
+      body: {
+        password: 'any_password'
+      }
+    }
+
+    const httpResponse = sut.route(httpRequest)
+    expect(httpResponse.statusCode).toBe(500)
+  })
+
+  test('Should return 500 if no PasswordCheckUseCase has no check method', () => {
+    // Re-creating spy class with no check method
+    const passwordCheckUseCaseSpy = new PasswordCheckRouter({})
+    const sut = new PasswordCheckRouter(passwordCheckUseCaseSpy)
+
+    const httpRequest = {
+      body: {
+        password: 'any_password'
+      }
+    }
+
+    const httpResponse = sut.route(httpRequest)
+    expect(httpResponse.statusCode).toBe(500)
+  })
 })

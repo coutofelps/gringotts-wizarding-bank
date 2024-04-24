@@ -6,7 +6,7 @@ module.exports = class PasswordCheckRouter {
   }
 
   route (httpRequest) {
-    if (!httpRequest || !httpRequest.body) {
+    if (!httpRequest || !httpRequest.body || !this.passworCheckUseCase || !this.passworCheckUseCase.check) {
       return HttpReponse.serverError()
     }
 
@@ -17,5 +17,6 @@ module.exports = class PasswordCheckRouter {
     }
 
     this.passworCheckUseCase.check(password)
+    return HttpReponse.badRequest()
   }
 }
