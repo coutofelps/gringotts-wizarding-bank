@@ -1,5 +1,6 @@
 const PasswordCheckRouter = require('./password-check-router')
 const MissingParamError = require('../helpers/missing-param-error')
+const InvalidParamError = require('../helpers/invalid-param-error')
 const ServerError = require('../helpers/server-error')
 
 const makePasswordCheckUseCaseSpy = () => {
@@ -24,15 +25,29 @@ const makePasswordCheckUseCaseSpyWithError = () => {
   return new PasswordCheckUseCaseSpy()
 }
 
+const makePasswordValidator = () => {
+  class PasswordValidatorSpy {
+    isValid (password) {
+      return this.isPasswordValid
+    }
+  }
+
+  const passwordValidatorSpy = new PasswordValidatorSpy()
+  passwordValidatorSpy.isPasswordValid = true
+  return passwordValidatorSpy
+}
+
 const makeSut = () => {
   const passwordCheckUseCaseSpy = makePasswordCheckUseCaseSpy()
+  const passwordValidatorSpy = makePasswordValidator()
   passwordCheckUseCaseSpy.isValidPassword = true
 
-  const sut = new PasswordCheckRouter(passwordCheckUseCaseSpy)
+  const sut = new PasswordCheckRouter(passwordCheckUseCaseSpy, passwordValidatorSpy)
 
   return {
     sut,
-    passwordCheckUseCaseSpy
+    passwordCheckUseCaseSpy,
+    passwordValidatorSpy
   }
 }
 
@@ -130,7 +145,22 @@ describe('Password checker router', () => {
     expect(httpResponse.body).toEqual(new ServerError())
   })
 
-  test('Should return 200 when valid credentials are provided', async () => {
+  test('Should return 400 if an invalid password is provided ', async () => {
+    const { sut, passwordValidatorSpy } = makeSut()
+    passwordValidatorSpy.isPasswordValid = false
+
+    const httpRequest = {
+      body: {
+        password: 'any_password'
+      }
+    }
+
+    const httpResponse = await sut.route(httpRequest)
+    expect(httpResponse.statusCode).toBe(400)
+    expect(httpResponse.body).toEqual(new InvalidParamError('password'))
+  })
+
+  test('Should return 200 when valid password are provided', async () => {
     const { sut, passwordCheckUseCaseSpy } = makeSut()
 
     const httpRequest = {
