@@ -28,6 +28,7 @@ const makePasswordCheckUseCaseSpyWithError = () => {
 const makePasswordValidator = () => {
   class PasswordValidatorSpy {
     isValid (password) {
+      this.password = password
       return this.isPasswordValid
     }
   }
@@ -230,5 +231,18 @@ describe('Password checker router', () => {
     const httpResponse = await sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(200)
     expect(httpResponse.body.isValidPassword).toEqual(passwordCheckUseCaseSpy.isValidPassword)
+  })
+
+  test('Should call PasswordValidator with correct password', async () => {
+    const { sut, passwordValidatorSpy } = makeSut()
+
+    const httpRequest = {
+      body: {
+        password: 'valid_password'
+      }
+    }
+
+    await sut.route(httpRequest)
+    expect(passwordValidatorSpy.password).toEqual(httpRequest.body.password)
   })
 })
