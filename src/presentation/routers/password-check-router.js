@@ -5,7 +5,7 @@ module.exports = class PasswordCheckRouter {
     this.passworCheckUseCase = passworCheckUseCase
   }
 
-  route (httpRequest) {
+  async route (httpRequest) {
     try {
       const { password } = httpRequest.body
 
@@ -13,7 +13,7 @@ module.exports = class PasswordCheckRouter {
         return HttpReponse.badRequest('password')
       }
 
-      const isValidPassword = this.passworCheckUseCase.check(password)
+      const isValidPassword = await this.passworCheckUseCase.check(password)
 
       if (!isValidPassword) {
         return HttpReponse.badRequest()
