@@ -37,6 +37,16 @@ const makePasswordValidator = () => {
   return passwordValidatorSpy
 }
 
+const makePasswordValidatorWithError = () => {
+  class PasswordValidatorSpy {
+    isValid (password) {
+      throw new Error()
+    }
+  }
+
+  return new PasswordValidatorSpy()
+}
+
 const makeSut = () => {
   const passwordCheckUseCaseSpy = makePasswordCheckUseCaseSpy()
   const passwordValidatorSpy = makePasswordValidator()
@@ -128,7 +138,7 @@ describe('Password checker router', () => {
     expect(httpResponse.body).toEqual(new ServerError())
   })
 
-  test('Should return 500 if no PasswordCheckUseCase throws ', async () => {
+  test('Should return 500 if PasswordCheckUseCase throws ', async () => {
     const passwordCheckUseCaseSpy = makePasswordCheckUseCaseSpyWithError()
     passwordCheckUseCaseSpy.isValidPassword = true
 
@@ -179,6 +189,23 @@ describe('Password checker router', () => {
     const passwordCheckUseCaseSpy = makePasswordCheckUseCaseSpy()
     // Re-creating spy class no isValid method
     const sut = new PasswordCheckRouter(passwordCheckUseCaseSpy, {})
+
+    const httpRequest = {
+      body: {
+        password: 'any_password'
+      }
+    }
+
+    const httpResponse = await sut.route(httpRequest)
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
+  })
+
+  test('Should return 500 if PasswordValidator throws ', async () => {
+    const passwordCheckUseCaseSpy = makePasswordCheckUseCaseSpy()
+    const passwordValidatorSpy = makePasswordValidatorWithError()
+
+    const sut = new PasswordCheckRouter(passwordCheckUseCaseSpy, passwordValidatorSpy)
 
     const httpRequest = {
       body: {
