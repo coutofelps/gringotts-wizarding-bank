@@ -160,6 +160,37 @@ describe('Password checker router', () => {
     expect(httpResponse.body).toEqual(new InvalidParamError('password'))
   })
 
+  test('Should return 500 if no PasswordValidator is provided', async () => {
+    const passwordCheckUseCaseSpy = makePasswordCheckUseCaseSpy()
+    const sut = new PasswordCheckRouter(passwordCheckUseCaseSpy)
+
+    const httpRequest = {
+      body: {
+        password: 'any_password'
+      }
+    }
+
+    const httpResponse = await sut.route(httpRequest)
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
+  })
+
+  test('Should return 500 if PasswordValidator has no isValid method', async () => {
+    const passwordCheckUseCaseSpy = makePasswordCheckUseCaseSpy()
+    // Re-creating spy class no isValid method
+    const sut = new PasswordCheckRouter(passwordCheckUseCaseSpy, {})
+
+    const httpRequest = {
+      body: {
+        password: 'any_password'
+      }
+    }
+
+    const httpResponse = await sut.route(httpRequest)
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
+  })
+
   test('Should return 200 when valid password are provided', async () => {
     const { sut, passwordCheckUseCaseSpy } = makeSut()
 
