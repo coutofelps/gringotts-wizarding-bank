@@ -16,7 +16,14 @@ module.exports = class PasswordCheckRouter {
       return HttpReponse.badRequest('password')
     }
 
-    this.passworCheckUseCase.check(password)
-    return HttpReponse.badRequest()
+    const isValidPassword = this.passworCheckUseCase.check(password)
+
+    if (!isValidPassword) {
+      return HttpReponse.badRequest()
+    }
+
+    return {
+      statusCode: 200
+    }
   }
 }

@@ -5,10 +5,14 @@ const makeSut = () => {
   class PasswordCheckUseCaseSpy {
     check (password) {
       this.password = password
+
+      return this.isValidPassword
     }
   }
 
   const passwordCheckUseCaseSpy = new PasswordCheckUseCaseSpy()
+  passwordCheckUseCaseSpy.isValidPassword = true
+
   const sut = new PasswordCheckRouter(passwordCheckUseCaseSpy)
 
   return {
@@ -88,5 +92,18 @@ describe('Password checker router', () => {
 
     const httpResponse = sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(500)
+  })
+
+  test('Should return 200 when valid credentials are provided', () => {
+    const { sut } = makeSut()
+
+    const httpRequest = {
+      body: {
+        password: 'valid_password'
+      }
+    }
+
+    const httpResponse = sut.route(httpRequest)
+    expect(httpResponse.statusCode).toBe(200)
   })
 })
