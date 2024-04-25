@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "express": "^4.19.2",
+    "fast-glob": "^3.3.2",
     "validator": "^13.11.0"
   }
 }

@@ -6,6 +6,8 @@ const makeSut = () => {
       if (!password) {
         throw new MissingParamError('password')
       }
+
+      return true
     }
   }
 
