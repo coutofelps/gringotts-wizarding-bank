@@ -1,3 +1,4 @@
 const app = require('./config/app')
+const env = require('./config/env')
 
-app.listen(5858, () => console.log('Server running.'))
+app.listen(env.port, () => console.log(`Server running at localhost: ${env.port}`))
