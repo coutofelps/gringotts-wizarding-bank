@@ -2,7 +2,7 @@ const HttpReponse = require('../helpers/http-response')
 const { InvalidParamError, MissingParamError } = require('../../utils/errors')
 
 module.exports = class PasswordCheckRouter {
-  constructor (passwordCheckUseCase, passwordValidator) {
+  constructor ({ passwordCheckUseCase, passwordValidator } = {}) {
     this.passwordCheckUseCase = passwordCheckUseCase
     this.passwordValidator = passwordValidator
   }

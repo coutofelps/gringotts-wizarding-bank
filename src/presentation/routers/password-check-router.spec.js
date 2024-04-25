@@ -2,6 +2,23 @@ const PasswordCheckRouter = require('./password-check-router')
 const { InvalidParamError, MissingParamError } = require('../../utils/errors')
 const { ServerError } = require('../errors')
 
+const makeSut = () => {
+  const passwordCheckUseCaseSpy = makePasswordCheckUseCaseSpy()
+  const passwordValidatorSpy = makePasswordValidator()
+  passwordCheckUseCaseSpy.isValidPassword = true
+
+  const sut = new PasswordCheckRouter({
+    passwordCheckUseCase: passwordCheckUseCaseSpy,
+    passwordValidator: passwordValidatorSpy
+  })
+
+  return {
+    sut,
+    passwordCheckUseCaseSpy,
+    passwordValidatorSpy
+  }
+}
+
 const makePasswordCheckUseCaseSpy = () => {
   class PasswordCheckUseCaseSpy {
     async save (password) {
@@ -45,20 +62,6 @@ const makePasswordValidatorWithError = () => {
   }
 
   return new PasswordValidatorSpy()
-}
-
-const makeSut = () => {
-  const passwordCheckUseCaseSpy = makePasswordCheckUseCaseSpy()
-  const passwordValidatorSpy = makePasswordValidator()
-  passwordCheckUseCaseSpy.isValidPassword = true
-
-  const sut = new PasswordCheckRouter(passwordCheckUseCaseSpy, passwordValidatorSpy)
-
-  return {
-    sut,
-    passwordCheckUseCaseSpy,
-    passwordValidatorSpy
-  }
 }
 
 describe('Password checker router', () => {
@@ -243,5 +246,36 @@ describe('Password checker router', () => {
 
     await sut.route(httpRequest)
     expect(passwordValidatorSpy.password).toEqual(httpRequest.body.password)
+  })
+
+  test('Should throw if invalid dependencies are provided', async () => {
+    const invalid = {}
+    const passwordCheckUseCase = makePasswordCheckUseCaseSpy()
+    const suts = [].concat(
+      new PasswordCheckRouter(),
+      new PasswordCheckRouter({}),
+      new PasswordCheckRouter({
+        passwordCheckUseCase: invalid
+      }),
+      new PasswordCheckRouter({
+        passwordCheckUseCase
+      }),
+      new PasswordCheckRouter({
+        passwordCheckUseCase,
+        passwordValidator: invalid
+      })
+    )
+
+    for (const sut of suts) {
+      const httpRequest = {
+        body: {
+          password: 'any_password'
+        }
+      }
+
+      const httpReponse = await sut.route(httpRequest)
+      expect(httpReponse.statusCode).toBe(500)
+      expect(httpReponse.body).toEqual(new ServerError())
+    }
   })
 })
