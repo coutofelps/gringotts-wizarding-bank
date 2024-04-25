@@ -1,7 +1,7 @@
 const { MissingParamError } = require('../../utils/errors')
 
 const makeSut = () => {
-  class PasswordUseCase {
+  class PasswordCheckRepository {
     async save (password) {
       if (!password) {
         throw new MissingParamError('password')
@@ -9,14 +9,14 @@ const makeSut = () => {
     }
   }
 
-  const sut = new PasswordUseCase()
+  const sut = new PasswordCheckRepository()
 
   return {
     sut
   }
 }
 
-describe('Password check use case', () => {
+describe('Password check repository', () => {
   test('Should throw if no password is provided', async () => {
     const { sut } = makeSut()
     const promise = sut.save()
