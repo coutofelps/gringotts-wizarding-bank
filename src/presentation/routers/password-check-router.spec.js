@@ -278,4 +278,29 @@ describe('Password checker router', () => {
       expect(httpReponse.body).toEqual(new ServerError())
     }
   })
+
+  test('Should throw if any dependency throws', async () => {
+    const passwordCheckUseCase = makePasswordCheckUseCaseSpy()
+    const suts = [].concat(
+      new PasswordCheckRouter({
+        passwordCheckUseCase: makePasswordCheckUseCaseSpyWithError()
+      }),
+      new PasswordCheckRouter({
+        passwordCheckUseCase,
+        passwordValidator: makePasswordValidatorWithError()
+      })
+    )
+
+    for (const sut of suts) {
+      const httpRequest = {
+        body: {
+          password: 'any_password'
+        }
+      }
+
+      const httpReponse = await sut.route(httpRequest)
+      expect(httpReponse.statusCode).toBe(500)
+      expect(httpReponse.body).toEqual(new ServerError())
+    }
+  })
 })
