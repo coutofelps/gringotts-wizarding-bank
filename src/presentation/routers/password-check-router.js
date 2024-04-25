@@ -1,5 +1,5 @@
 const HttpReponse = require('../helpers/http-response')
-const { InvalidParamError, MissingParamError } = require('../../utils/errors')
+const { MissingParamError } = require('../../utils/errors')
 
 module.exports = class PasswordCheckRouter {
   constructor ({ passwordCheckUseCase, passwordValidator } = {}) {
@@ -15,18 +15,18 @@ module.exports = class PasswordCheckRouter {
         return HttpReponse.badRequest(new MissingParamError('password'))
       }
 
-      if (!this.passwordValidator.isValid(password)) {
-        return HttpReponse.badRequest(new InvalidParamError('password'))
-      }
+      /*
+      // If we need to use an use case
+      const passwordIsSaved = await this.passwordCheckUseCase.save(password)
 
-      const isValidPassword = await this.passwordCheckUseCase.save(password)
-
-      if (!isValidPassword) {
+      if (!passwordIsSaved) {
         return HttpReponse.badRequest()
       }
+      */
 
-      return HttpReponse.ok({ isValidPassword })
+      return HttpReponse.passwordStatus(this.passwordValidator.isValid(password))
     } catch (error) {
+      console.error(error)
       return HttpReponse.serverError()
     }
   }

@@ -21,4 +21,18 @@ module.exports = class HttpReponse {
       body: data
     }
   }
+
+  static passwordStatus (isValid) {
+    if (isValid) {
+      return {
+        statusCode: 200,
+        body: { valid: true }
+      }
+    } else {
+      return {
+        statusCode: 400,
+        body: { valid: false }
+      }
+    }
+  }
 }
