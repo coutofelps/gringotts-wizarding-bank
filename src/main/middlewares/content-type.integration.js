@@ -1,8 +1,7 @@
 const request = require('supertest')
+let app
 
 describe('Content-Type Middleware', () => {
-  let app
-
   // Reseting Jest URL cache (used if you want to use same URL for an integration test)
   beforeEach(() => {
     jest.resetModules()
