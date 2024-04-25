@@ -6,8 +6,7 @@ module.exports = class PasswordCheckUseCase {
   }
 
   async save (password) {
-    // We can do any action here
-
+    // We can do any action here, like this:
     return this.passwordCheckRepository.save(password)
   }
 }

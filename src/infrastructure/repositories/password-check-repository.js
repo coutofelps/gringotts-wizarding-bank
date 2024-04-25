@@ -1,8 +1,12 @@
+const { MissingParamError } = require('../../utils/errors')
+
 module.exports = class PasswordCheckRepository {
   async save (password) {
-    // We can do any action here, like save it into DB
+    if (!password) {
+      throw new MissingParamError('password')
+    }
 
-    console.log(password)
+    // We can save to database here, for example
 
     return true
   }

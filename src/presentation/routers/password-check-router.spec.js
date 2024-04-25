@@ -1,11 +1,11 @@
 const PasswordCheckRouter = require('./password-check-router')
-const { InvalidParamError, MissingParamError } = require('../../utils/errors')
+const { MissingParamError } = require('../../utils/errors')
 const { ServerError } = require('../errors')
 
 const makeSut = () => {
   const passwordCheckUseCaseSpy = makePasswordCheckUseCaseSpy()
   const passwordValidatorSpy = makePasswordValidator()
-  passwordCheckUseCaseSpy.isValidPassword = true
+  passwordCheckUseCaseSpy.valid = true
 
   const sut = new PasswordCheckRouter({
     passwordCheckUseCase: passwordCheckUseCaseSpy,
@@ -24,7 +24,7 @@ const makePasswordCheckUseCaseSpy = () => {
     async save (password) {
       this.password = password
 
-      return this.isValidPassword
+      return true
     }
   }
 
@@ -100,6 +100,7 @@ describe('Password checker router', () => {
 
   test('Should call PasswordCheckUseCase with correct params', async () => {
     const { sut, passwordCheckUseCaseSpy } = makeSut()
+    passwordCheckUseCaseSpy.password = 'any_password'
 
     const httpRequest = {
       body: {
@@ -143,7 +144,7 @@ describe('Password checker router', () => {
 
   test('Should return 500 if PasswordCheckUseCase throws ', async () => {
     const passwordCheckUseCaseSpy = makePasswordCheckUseCaseSpyWithError()
-    passwordCheckUseCaseSpy.isValidPassword = true
+    passwordCheckUseCaseSpy.valid = true
 
     const sut = new PasswordCheckRouter(passwordCheckUseCaseSpy)
 
@@ -170,7 +171,7 @@ describe('Password checker router', () => {
 
     const httpResponse = await sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(new InvalidParamError('password'))
+    expect(httpResponse.body.valid).toEqual(false)
   })
 
   test('Should return 500 if no PasswordValidator is provided', async () => {
@@ -232,7 +233,7 @@ describe('Password checker router', () => {
 
     const httpResponse = await sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(200)
-    expect(httpResponse.body.isValidPassword).toEqual(passwordCheckUseCaseSpy.isValidPassword)
+    expect(httpResponse.body.valid).toEqual(passwordCheckUseCaseSpy.valid)
   })
 
   test('Should call PasswordValidator with correct password', async () => {

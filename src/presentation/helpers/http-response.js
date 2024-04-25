@@ -15,12 +15,12 @@ module.exports = class HttpReponse {
     }
   }
 
-  static ok (data) {
-    return {
-      statusCode: 200,
-      body: data
-    }
-  }
+  // static ok (data) {
+  //   return {
+  //     statusCode: 200,
+  //     body: data
+  //   }
+  // }
 
   static passwordStatus (isValid) {
     if (isValid) {

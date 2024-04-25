@@ -1,21 +1,61 @@
 const PasswordValidator = require('./password-validator')
 
-const makeSut = () => {
-  return new PasswordValidator()
-}
+describe('Password Validator', () => {
+  describe('isValid', () => {
+    test('Should return false if password contains a space', () => {
+      const password = 'password with space'
+      const passwordValidator = new PasswordValidator()
+      const isValid = passwordValidator.isValid(password)
+      expect(isValid).toBe(false)
+    })
 
-describe('Password validator', () => {
-  test('Should return true if validator returns true', () => {
-    const sut = makeSut()
-    const isPasswordValid = sut.isValid('AbTp9!fok')
+    test('Should return false if password has repeated characters', () => {
+      const password = 'password with repeated characters'
+      const passwordValidator = new PasswordValidator()
+      const isValid = passwordValidator.isValid(password)
+      expect(isValid).toBe(false)
+    })
 
-    expect(isPasswordValid).toBe(true)
-  })
+    test('Should return false if password length is less than 9 characters', () => {
+      const password = '123Ab!'
+      const passwordValidator = new PasswordValidator()
+      const isValid = passwordValidator.isValid(password)
+      expect(isValid).toBe(false)
+    })
 
-  test('Should return false if validator returns false', () => {
-    const sut = makeSut()
-    const isPasswordValid = sut.isValid('invalid_password')
+    test('Should return false if password has no numbers', () => {
+      const password = 'PasswordNoNumbers!'
+      const passwordValidator = new PasswordValidator()
+      const isValid = passwordValidator.isValid(password)
+      expect(isValid).toBe(false)
+    })
 
-    expect(isPasswordValid).toBe(false)
+    test('Should return false if password has no lowercase letters', () => {
+      const password = 'PASSWORDNOLOWERCASE!'
+      const passwordValidator = new PasswordValidator()
+      const isValid = passwordValidator.isValid(password)
+      expect(isValid).toBe(false)
+    })
+
+    test('Should return false if password has no uppercase letters', () => {
+      const password = 'passwordnouppercase!'
+      const passwordValidator = new PasswordValidator()
+      const isValid = passwordValidator.isValid(password)
+      expect(isValid).toBe(false)
+    })
+
+    test('Should return false if password has no symbols', () => {
+      const password = 'PasswordNoSymbols123'
+      const passwordValidator = new PasswordValidator()
+      const isValid = passwordValidator.isValid(password)
+      expect(isValid).toBe(false)
+    })
+
+    test('Should return false if password is an empty string', () => {
+      const password = ''
+      const passwordValidator = new PasswordValidator()
+      const isValid = passwordValidator.isValid(password)
+      expect(isValid).toBe(false)
+    })
   })
 })

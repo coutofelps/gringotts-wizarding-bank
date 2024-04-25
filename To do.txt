@@ -1,0 +1,4 @@
+To do:
+
+- Criar README.md do projeto, com: motivo por ter escolhido a arquitetura limpa, como utilizar e rodar seus diversos scripts, listar libs, esclarecer que os usecases e repositórios são meramente ilustrativos;
+- Criar diagrama que explique como o projeto funciona (back-end).
